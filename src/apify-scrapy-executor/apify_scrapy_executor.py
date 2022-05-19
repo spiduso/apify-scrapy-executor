@@ -39,9 +39,12 @@ class SpiderExecutor:
         """
         result = []
         process = CrawlerProcess(get_project_settings())
+        client = ApifyClient(os.environ['APIFY_TOKEN'])
+        default_dataset_client = client.dataset(dataset_id)
 
         # defines each item to save to the result
         def crawler_results(signal, sender, item, response, spider):
+            default_dataset_client.push_items(item)
             result.append(item)
 
         dispatcher.connect(crawler_results, signal=signals.item_scraped)
@@ -55,4 +58,4 @@ class SpiderExecutor:
         process.start()
 
         # uploads to dataset
-        _upload_to_apify_dataset(result, dataset_id)
+        # _upload_to_apify_dataset(result, dataset_id)
